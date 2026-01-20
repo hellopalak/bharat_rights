@@ -42,6 +42,28 @@ export const ProfileForm = () => {
         };
     });
 
+    // Load existing profile data when component mounts or profile updates
+    React.useEffect(() => {
+        if (profile) {
+            setFormData({
+                name: profile.name,
+                age: profile.age,
+                gender: profile.gender,
+                income: profile.income,
+                state: profile.state,
+                district: profile.district,
+                city: profile.city || '',
+                occupation: profile.occupation,
+                institute: profile.institute || '',
+                company: profile.company || '',
+                farmSize: profile.farmSize || '',
+                disability: profile.disability,
+                caste: profile.caste,
+                maritalStatus: profile.maritalStatus
+            });
+        }
+    }, [profile]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
 

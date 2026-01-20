@@ -185,6 +185,35 @@ class DatabaseService {
         }
     }
 
+    // --- Schemes ---
+    async getSchemes(): Promise<any[]> {
+        if (supabase) {
+            const { data, error } = await supabase
+                .from('schemes')
+                .select('*');
+
+            if (error) {
+                console.error("Error fetching schemes:", error);
+                return [];
+            }
+
+            // Map DB snake_case or specific column names if different? 
+            // We used double quotes in SQL for camelCase columns so it should match Typescript automatically if Supabase driver respects it.
+            // However, Supabase usually returns what is in the DB.
+            // Our DB columns: beneficiaryGroups, documentsRequired, applicationMode, officialUrl
+            // Supabase returns them as is if created with quotes.
+            return data || [];
+        } else {
+            // Fallback to the imported SCHEMES if needed, but we want to break specific import dependency?
+            // Actually dynamic import or just returning empty if local storage empty is fine, 
+            // OR we can import SCHEMES here just for fallback layer.
+            // For now, let's assume we might not need fallback if connected, but let's be safe.
+            // We'll return an empty array or logic to load from file if we really wanted to persist local dev without DB.
+            // Simulating usage of the local file data as "source of truth" for non-DB mode:
+            return []; // The app should ideally rely on Context which handles the fallback or imports
+        }
+    }
+
     async createPost(post: any): Promise<any> {
         if (supabase) {
             const { data: { user } } = await supabase.auth.getUser();

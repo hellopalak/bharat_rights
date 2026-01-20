@@ -1,8 +1,7 @@
 import type { Scheme, UserProfile } from '../data/types';
-import { SCHEMES } from '../data/schemes';
 
-export const findEligibleSchemes = (profile: UserProfile): Scheme[] => {
-    return SCHEMES.filter(scheme => {
+export const findEligibleSchemes = (profile: UserProfile, schemes: Scheme[]): Scheme[] => {
+    return schemes.filter(scheme => {
         const { eligibility } = scheme;
 
         // Age Check
@@ -16,16 +15,31 @@ export const findEligibleSchemes = (profile: UserProfile): Scheme[] => {
         if (eligibility.incomeMax && profile.income > eligibility.incomeMax) return false;
 
         // Student Check
+        // If scheme requires student, user MUST be student.
         if (eligibility.isStudent && profile.occupation !== 'student') return false;
 
         // Disability Check
         if (eligibility.disability && !profile.disability) return false;
 
         // Caste Check
-        if (eligibility.caste && !eligibility.caste.includes(profile.caste)) return false;
+        if (eligibility.caste && eligibility.caste.length > 0 && !eligibility.caste.includes(profile.caste)) return false;
 
         // State Check
+        // If scheme is state-specific, user must match state. If scheme is central (undefined state), everyone is eligible.
         if (eligibility.state && eligibility.state !== profile.state) return false;
+
+        // Occupation Check
+        // Check exact occupation match if scheme specifies specific occupations (e.g. farmer)
+        if (eligibility.occupation && eligibility.occupation.length > 0) {
+            if (!eligibility.occupation.includes(profile.occupation)) return false;
+        }
+
+        // Marital Status Check
+        if (eligibility.maritalStatus && profile.maritalStatus && eligibility.maritalStatus !== profile.maritalStatus) return false;
+        // If scheme requires specific marital status but user hasn't specified one?
+        // Assuming if user field is optional/undefined, they fail a strict check? 
+        // Or if user hasn't filled it, we can't be sure. Let's assume strict fail for now if requirement exists.
+        if (eligibility.maritalStatus && !profile.maritalStatus) return false;
 
         return true;
     });

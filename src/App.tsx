@@ -6,6 +6,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { SavedSchemesProvider } from './contexts/SavedSchemesContext';
 import { DocumentProvider } from './contexts/DocumentContext';
 import { ApplicationProvider } from './contexts/ApplicationContext';
+import { SchemesProvider } from './contexts/SchemesContext';
 import { LandingPage } from './pages/LandingPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SchemeExplore } from './pages/SchemeExplore';
@@ -23,30 +24,32 @@ function App() {
     <LanguageProvider>
       <AuthProvider>
         <ProfileProvider>
-          <DocumentProvider>
-            <SavedSchemesProvider>
-              <ApplicationProvider>
-                <Router>
-                  <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-                    <Navbar />
-                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                      <Routes>
-                        <Route path="/" element={<LandingPage />} />
-                        <Route path="/auth" element={<AuthPage />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/schemes" element={<SchemeExplore />} />
-                        <Route path="/saved" element={<SavedSchemesPage />} />
-                        <Route path="/applications" element={<ApplicationTracker />} />
-                        <Route path="/documents" element={<DocumentLocker />} />
-                        <Route path="/community" element={<CommunityForum />} />
-                      </Routes>
-                    </main>
-                    <SchemeBot />
-                  </div>
-                </Router>
-              </ApplicationProvider>
-            </SavedSchemesProvider>
-          </DocumentProvider>
+          <SchemesProvider>
+            <DocumentProvider>
+              <SavedSchemesProvider>
+                <ApplicationProvider>
+                  <Router>
+                    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+                      <Navbar />
+                      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <Routes>
+                          <Route path="/" element={<LandingPage />} />
+                          <Route path="/auth" element={<AuthPage />} />
+                          <Route path="/profile" element={<ProfilePage />} />
+                          <Route path="/schemes" element={<SchemeExplore />} />
+                          <Route path="/saved" element={<SavedSchemesPage />} />
+                          <Route path="/applications" element={<ApplicationTracker />} />
+                          <Route path="/documents" element={<DocumentLocker />} />
+                          <Route path="/community" element={<CommunityForum />} />
+                        </Routes>
+                      </main>
+                      <SchemeBot />
+                    </div>
+                  </Router>
+                </ApplicationProvider>
+              </SavedSchemesProvider>
+            </DocumentProvider>
+          </SchemesProvider>
         </ProfileProvider>
       </AuthProvider>
     </LanguageProvider>

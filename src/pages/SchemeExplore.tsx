@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useProfile } from '../contexts/ProfileContext';
-import { SCHEMES } from '../data/schemes';
+import { useSchemes } from '../contexts/SchemesContext';
 import { findEligibleSchemes } from '../services/SchemeEngine';
 import { SchemeCard } from '../components/schemes/SchemeCard';
 import { SchemeDetailsModal } from '../components/schemes/SchemeDetailsModal';
@@ -11,17 +11,29 @@ import type { SchemeCategory, Scheme } from '../data/types';
 
 export const SchemeExplore = () => {
     const { profile } = useProfile();
+    const { schemes: SCHEMES, isLoading } = useSchemes();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState<SchemeCategory | 'all'>('all');
     const [selectedScheme, setSelectedScheme] = useState<Scheme | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showEligibleOnly, setShowEligibleOnly] = useState(false);
 
     const eligibleSchemes = useMemo(() => {
-        return profile ? findEligibleSchemes(profile) : [];
+        return profile ? findEligibleSchemes(profile, SCHEMES) : [];
+    }, [profile, SCHEMES]);
+
+    // Update showEligibleOnly default when profile loads
+    useEffect(() => {
+        if (profile) setShowEligibleOnly(true);
     }, [profile]);
 
     const filteredSchemes = useMemo(() => {
         let result = SCHEMES;
+
+        // Filter by Eligibility
+        if (showEligibleOnly && profile) {
+            result = eligibleSchemes;
+        }
 
         // Search
         if (searchTerm) {
@@ -33,13 +45,13 @@ export const SchemeExplore = () => {
             );
         }
 
-        // Filter
+        // Filter by Category
         if (filterCategory !== 'all') {
             result = result.filter(s => s.category.includes(filterCategory));
         }
 
         return result;
-    }, [searchTerm, filterCategory]);
+    }, [searchTerm, filterCategory, showEligibleOnly, profile, SCHEMES, eligibleSchemes]);
 
     const isEligible = (schemeId: string) => {
         return eligibleSchemes.some(s => s.id === schemeId);
@@ -80,6 +92,21 @@ export const SchemeExplore = () => {
                         <VoiceSearch onSearch={setSearchTerm} />
                     </div>
                 </div>
+
+                {profile && (
+                    <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 cursor-pointer select-none px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
+                            <input
+                                type="checkbox"
+                                checked={showEligibleOnly}
+                                onChange={(e) => setShowEligibleOnly(e.target.checked)}
+                                className="messageCheckbox w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+                            />
+                            <span className="text-slate-700 font-medium">Eligible Only</span>
+                        </label>
+                    </div>
+                )}
+
                 <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                     <select
                         value={filterCategory}

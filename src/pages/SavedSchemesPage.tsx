@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSavedSchemes } from '../contexts/SavedSchemesContext';
-import { SCHEMES } from '../data/schemes';
+import { useSchemes } from '../contexts/SchemesContext';
 import { SchemeCard } from '../components/schemes/SchemeCard';
 import { useProfile } from '../contexts/ProfileContext';
 import { findEligibleSchemes } from '../services/SchemeEngine';
@@ -9,10 +9,11 @@ import { Link } from 'react-router-dom';
 
 export const SavedSchemesPage = () => {
     const { savedSchemeIds } = useSavedSchemes();
+    const { schemes: SCHEMES } = useSchemes();
     const { profile } = useProfile();
 
     const savedSchemes = SCHEMES.filter(scheme => savedSchemeIds.includes(scheme.id));
-    const eligibleSchemes = profile ? findEligibleSchemes(profile) : [];
+    const eligibleSchemes = profile ? findEligibleSchemes(profile, SCHEMES) : [];
 
     const isEligible = (schemeId: string) => {
         return eligibleSchemes.some(s => s.id === schemeId);

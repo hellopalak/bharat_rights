@@ -33,6 +33,7 @@ export interface Scheme {
         occupation?: string[];
         isStudent?: boolean;
         state?: string; // If null, applies to all
+        maritalStatus?: 'single' | 'married' | 'widowed';
     };
     benefits: string[];
     documentsRequired: string[];
