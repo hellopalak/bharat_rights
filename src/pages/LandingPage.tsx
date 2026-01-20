@@ -10,19 +10,19 @@ export const LandingPage = () => {
     return (
         <div className="space-y-20 pb-20">
             {/* Hero Section */}
-            <section className="relative bg-gradient-to-b from-primary-50 to-white pt-20 pb-32 overflow-hidden">
+            <section className="relative bg-gradient-to-b from-primary-50 to-white dark:from-slate-900 dark:to-slate-800 pt-20 pb-32 overflow-hidden transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-100 text-primary-700 text-sm font-medium mb-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm font-medium mb-6">
                         <Zap className="w-4 h-4" />
                         <span>AI-Powered Scheme Discovery</span>
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight mb-6">
+                    <h1 className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tight mb-6">
                         {t('hero.title').split(',')[0]},<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-600">
                             {t('hero.title').split(',')[1] || 'Claim Your Benefits'}
                         </span>
                     </h1>
-                    <p className="max-w-2xl mx-auto text-xl text-slate-600 mb-10 leading-relaxed">
+                    <p className="max-w-2xl mx-auto text-xl text-slate-600 dark:text-slate-300 mb-10 leading-relaxed">
                         {t('hero.subtitle')}
                     </p>
 
@@ -36,7 +36,7 @@ export const LandingPage = () => {
                         </button>
                         <button
                             onClick={() => navigate('/schemes')}
-                            className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+                            className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
                         >
                             {t('hero.browse')}
                         </button>
@@ -45,8 +45,8 @@ export const LandingPage = () => {
 
                 {/* Background decorative blobs */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
-                    <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-                    <div className="absolute top-20 right-10 w-72 h-72 bg-secondary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+                    <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200 dark:bg-primary-900/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 animate-blob"></div>
+                    <div className="absolute top-20 right-10 w-72 h-72 bg-secondary-200 dark:bg-secondary-900/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
                 </div>
             </section>
 
@@ -72,9 +72,9 @@ export const LandingPage = () => {
             </section>
 
             {/* Category Quick Links */}
-            <section className="bg-slate-50 py-20">
+            <section className="bg-slate-50 dark:bg-slate-900/50 py-20 transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-12">Browse by Category</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12">Browse by Category</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <CategoryCard title="Students" emoji="🎓" category="education" onClick={() => navigate('/schemes?category=education')} />
                         <CategoryCard title="Women" emoji="👩" category="woman" onClick={() => navigate('/schemes?category=social_welfare')} />
@@ -92,18 +92,18 @@ export const LandingPage = () => {
 };
 
 const CategoryCard = ({ title, emoji, onClick }: { title: string, emoji: string, category: string, onClick: () => void }) => (
-    <button onClick={onClick} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-primary-300 transition-all group">
+    <button onClick={onClick} className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-primary-300 transition-all group">
         <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">{emoji}</div>
-        <div className="font-semibold text-slate-700 group-hover:text-primary-600">{title}</div>
+        <div className="font-semibold text-slate-700 dark:text-slate-200 group-hover:text-primary-600">{title}</div>
     </button>
 );
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
-    <div className="bg-white p-8 rounded-2xl border border-slate-100 hover:shadow-xl transition-shadow">
-        <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mb-6">
+    <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow">
+        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 rounded-xl flex items-center justify-center mb-6">
             {icon}
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-        <p className="text-slate-600 leading-relaxed">{description}</p>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{title}</h3>
+        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{description}</p>
     </div>
 );

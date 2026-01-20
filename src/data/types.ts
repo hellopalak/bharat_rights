@@ -68,3 +68,15 @@ export interface DocumentItem {
     verificationSource?: 'manual' | 'digilocker';
     lastUpdated: string;
 }
+
+export interface Post {
+    id: string;
+    user_id: string;
+    author_name: string;
+    title: string;
+    content: string;
+    category: string;
+    likes: number;
+    comments_count: number;
+    created_at: string;
+}

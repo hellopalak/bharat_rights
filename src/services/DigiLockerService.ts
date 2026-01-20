@@ -4,10 +4,11 @@ import type { DocumentItem } from "../data/types";
 export class DigiLockerService {
     async connect(): Promise<{ status: 'success' | 'failed', user?: string }> {
         return new Promise((resolve) => {
-            // Simulate popup / auth delay
+            // Delay is now handled by the UI Modal for better UX
+            // Service just confirms the final handshake
             setTimeout(() => {
                 resolve({ status: 'success', user: 'Rahul Sharma (Aadhar Verified)' });
-            }, 2000);
+            }, 1000);
         });
     }
 

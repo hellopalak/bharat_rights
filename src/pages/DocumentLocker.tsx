@@ -16,24 +16,30 @@ const COMMON_DOCUMENTS = [
 
 
 import { digiLocker } from '../services/DigiLockerService';
+import { DigiLockerAuthModal } from '../components/common/DigiLockerAuthModal';
 
 export const DocumentLocker = () => {
     // Use global persistent state
     const { documents, toggleDocument, isCollected, isVerified, syncWithDigiLocker, isLoading } = useDocuments();
     const [isConnecting, setIsConnecting] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-    const handleConnectDigiLocker = async () => {
-        setIsConnecting(true);
+    const handleConnectDigiLocker = () => {
+        setIsAuthModalOpen(true);
+    };
+
+    const handleAuthSuccess = async () => {
+        setIsConnecting(true); // Show loading on button while final sync happens
         try {
             const auth = await digiLocker.connect();
             if (auth.status === 'success') {
                 const docs = await digiLocker.fetchDocuments();
                 await syncWithDigiLocker(docs);
-                alert(`Successfully connected to DigiLocker! Synced ${docs.length} verified documents.`);
+                // Success message handled by UI flow usually, or we can toast here
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("DigiLocker Error", error);
-            alert("Failed to connect to DigiLocker");
+            alert(`Failed to connect to DigiLocker: ${error.message || "Unknown error"}`);
         } finally {
             setIsConnecting(false);
         }
@@ -43,6 +49,12 @@ export const DocumentLocker = () => {
 
     return (
         <div className="space-y-8">
+            <DigiLockerAuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                onSuccess={handleAuthSuccess}
+            />
+
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900">Document Locker</h1>

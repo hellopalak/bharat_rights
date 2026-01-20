@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar';
 import { ProfileProvider } from './contexts/ProfileContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { SavedSchemesProvider } from './contexts/SavedSchemesContext';
 import { DocumentProvider } from './contexts/DocumentContext';
 import { ApplicationProvider } from './contexts/ApplicationContext';
@@ -22,36 +23,38 @@ import { AuthPage } from './pages/AuthPage';
 function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <ProfileProvider>
-          <SchemesProvider>
-            <DocumentProvider>
-              <SavedSchemesProvider>
-                <ApplicationProvider>
-                  <Router>
-                    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-                      <Navbar />
-                      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <Routes>
-                          <Route path="/" element={<LandingPage />} />
-                          <Route path="/auth" element={<AuthPage />} />
-                          <Route path="/profile" element={<ProfilePage />} />
-                          <Route path="/schemes" element={<SchemeExplore />} />
-                          <Route path="/saved" element={<SavedSchemesPage />} />
-                          <Route path="/applications" element={<ApplicationTracker />} />
-                          <Route path="/documents" element={<DocumentLocker />} />
-                          <Route path="/community" element={<CommunityForum />} />
-                        </Routes>
-                      </main>
-                      <SchemeBot />
-                    </div>
-                  </Router>
-                </ApplicationProvider>
-              </SavedSchemesProvider>
-            </DocumentProvider>
-          </SchemesProvider>
-        </ProfileProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ProfileProvider>
+            <SchemesProvider>
+              <DocumentProvider>
+                <SavedSchemesProvider>
+                  <ApplicationProvider>
+                    <Router>
+                      <div className="min-h-screen bg-surface font-sans text-text-primary transition-colors duration-300">
+                        <Navbar />
+                        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                          <Routes>
+                            <Route path="/" element={<LandingPage />} />
+                            <Route path="/auth" element={<AuthPage />} />
+                            <Route path="/profile" element={<ProfilePage />} />
+                            <Route path="/schemes" element={<SchemeExplore />} />
+                            <Route path="/saved" element={<SavedSchemesPage />} />
+                            <Route path="/applications" element={<ApplicationTracker />} />
+                            <Route path="/documents" element={<DocumentLocker />} />
+                            <Route path="/community" element={<CommunityForum />} />
+                          </Routes>
+                        </main>
+                        <SchemeBot />
+                      </div>
+                    </Router>
+                  </ApplicationProvider>
+                </SavedSchemesProvider>
+              </DocumentProvider>
+            </SchemesProvider>
+          </ProfileProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </LanguageProvider>
   );
 }

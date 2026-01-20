@@ -5,6 +5,7 @@ import { useProfile } from '../../contexts/ProfileContext';
 import { NotificationsDropdown } from '../common/NotificationsDropdown';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { ThemeSelector } from '../common/ThemeSelector';
 
 export const Navbar = () => {
     const { t } = useLanguage();
@@ -28,7 +29,7 @@ export const Navbar = () => {
     }, []);
 
     return (
-        <nav className="bg-white border-b border-secondary-200 sticky top-0 z-50">
+        <nav className="bg-background border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
@@ -53,6 +54,9 @@ export const Navbar = () => {
                         </div>
 
                         {/* Language button removed */}
+
+
+                        <ThemeSelector />
 
                         <div className="relative" ref={notificationRef}>
                             <button

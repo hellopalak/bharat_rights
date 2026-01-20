@@ -1,6 +1,13 @@
-import type { UserProfile, DocumentItem } from '../data/types';
+import type { UserProfile, DocumentItem, Scheme, Post } from '../data/types';
 import type { Application } from '../contexts/ApplicationContext';
 import { supabase } from '../lib/supabase';
+
+// ... (rest of imports)
+
+// ... (previous methods)
+
+
+
 
 // Simulating a delay to mimic network requests
 const DELAY_MS = 800;
@@ -170,15 +177,18 @@ class DatabaseService {
         }
     }
     // --- Community Forum ---
-    async getPosts(): Promise<any[]> {
+    async getPosts(): Promise<Post[]> {
         if (supabase) {
             const { data, error } = await supabase
                 .from('posts')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) console.error("Error fetching posts:", error);
-            return data || [];
+            if (error) {
+                console.error("Error fetching posts:", error);
+                return [];
+            }
+            return (data as Post[]) || [];
         } else {
             const data = localStorage.getItem('communityPosts');
             return delay(data ? JSON.parse(data) : []);
@@ -186,7 +196,7 @@ class DatabaseService {
     }
 
     // --- Schemes ---
-    async getSchemes(): Promise<any[]> {
+    async getSchemes(): Promise<Scheme[]> {
         if (supabase) {
             const { data, error } = await supabase
                 .from('schemes')
@@ -196,33 +206,20 @@ class DatabaseService {
                 console.error("Error fetching schemes:", error);
                 return [];
             }
-
-            // Map DB snake_case or specific column names if different? 
-            // We used double quotes in SQL for camelCase columns so it should match Typescript automatically if Supabase driver respects it.
-            // However, Supabase usually returns what is in the DB.
-            // Our DB columns: beneficiaryGroups, documentsRequired, applicationMode, officialUrl
-            // Supabase returns them as is if created with quotes.
-            return data || [];
+            return (data as Scheme[]) || [];
         } else {
-            // Fallback to the imported SCHEMES if needed, but we want to break specific import dependency?
-            // Actually dynamic import or just returning empty if local storage empty is fine, 
-            // OR we can import SCHEMES here just for fallback layer.
-            // For now, let's assume we might not need fallback if connected, but let's be safe.
-            // We'll return an empty array or logic to load from file if we really wanted to persist local dev without DB.
-            // Simulating usage of the local file data as "source of truth" for non-DB mode:
-            return []; // The app should ideally rely on Context which handles the fallback or imports
+            return [];
         }
     }
 
-    async createPost(post: any): Promise<any> {
+    async createPost(post: Omit<Post, 'id' | 'user_id' | 'likes' | 'comments_count' | 'created_at' | 'author_name'> & { author: string }): Promise<Post> {
         if (supabase) {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("No authenticated user");
 
-            // Post object needs to map to DB columns
             const dbPost = {
                 user_id: user.id,
-                author_name: post.author, // Mapped from UI 'author'
+                author_name: post.author,
                 title: post.title,
                 content: post.content,
                 category: post.category,
@@ -237,13 +234,23 @@ class DatabaseService {
                 .single();
 
             if (error) throw error;
-            return data;
+            return data as Post;
         } else {
-            // Local fallback
             const currentPosts = await this.getPosts();
-            const newPosts = [post, ...currentPosts];
+            const newPost: Post = {
+                id: `POST-${Date.now()}`,
+                user_id: 'local-user',
+                author_name: post.author,
+                title: post.title,
+                content: post.content,
+                category: post.category,
+                likes: 0,
+                comments_count: 0,
+                created_at: new Date().toISOString()
+            };
+            const newPosts = [newPost, ...currentPosts];
             localStorage.setItem('communityPosts', JSON.stringify(newPosts));
-            return delay(post);
+            return delay(newPost);
         }
     }
 
