@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, User, Search, Menu, Globe, Heart, FileText, Briefcase, MessageSquare } from 'lucide-react';
+import { Bell, User, Search, Menu, Heart, FileText, Briefcase, MessageSquare } from 'lucide-react';
 import { useProfile } from '../../contexts/ProfileContext';
 import { NotificationsDropdown } from '../common/NotificationsDropdown';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const Navbar = () => {
-    const { language, setLanguage, t } = useLanguage();
+    const { t } = useLanguage();
     const { profile } = useProfile();
     const { user, signOut } = useAuth();
     const [showNotifications, setShowNotifications] = React.useState(false);
@@ -52,18 +52,7 @@ export const Navbar = () => {
                             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                         </div>
 
-                        <button
-                            onClick={() => {
-                                const newLang = language === 'en' ? 'hi' : 'en';
-                                setLanguage(newLang);
-                                console.log("Language switched to:", newLang);
-                            }}
-                            className="p-2 text-slate-600 hover:text-primary-600 rounded-full hover:bg-primary-50 transition-colors flex items-center gap-1"
-                            title="Switch Language"
-                        >
-                            <Globe className="w-5 h-5" />
-                            <span className="text-sm font-semibold">{language === 'en' ? 'HI' : 'EN'}</span>
-                        </button>
+                        {/* Language button removed */}
 
                         <div className="relative" ref={notificationRef}>
                             <button
