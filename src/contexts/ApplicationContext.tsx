@@ -29,11 +29,13 @@ import { useAuth } from './AuthContext';
 
 export const ApplicationProvider = ({ children }: { children: ReactNode }) => {
     const [applications, setApplications] = useState<Application[]>([]);
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
     // 1. Load from Database on mount and user change
     useEffect(() => {
         const loadApps = async () => {
+            if (loading) return; // Wait for auth to initialize
+
             if (user) {
                 const apps = await dbService.getApplications();
                 setApplications(apps);
@@ -42,7 +44,7 @@ export const ApplicationProvider = ({ children }: { children: ReactNode }) => {
             }
         };
         loadApps();
-    }, [user]);
+    }, [user, loading]);
 
     // 2. Simulation Loop: Upgrade status every 15 seconds
     useEffect(() => {
