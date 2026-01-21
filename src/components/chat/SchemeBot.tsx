@@ -56,20 +56,22 @@ export const SchemeBot = () => {
     // Mock AI Logic
     const generateResponse = (text: string): Message => {
         const lowerText = text.toLowerCase();
-        let responseText = "I'm not sure about that. Try asking about specific categories like 'health', 'education', or 'farming'.";
+        let responseText = "I'm not sure about that. Try asking about specific categories like 'health', 'education', 'farming', or 'pension'.";
 
-        if (lowerText.includes('hello') || lowerText.includes('hi')) {
-            responseText = "Hello! How can I assist you with government schemes today?";
-        } else if (lowerText.includes('scholarship') || lowerText.includes('student')) {
+        if (lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('namaste')) {
+            responseText = "Namaste! How can I assist you with government schemes today?";
+        } else if (lowerText.includes('scholarship') || lowerText.includes('student') || lowerText.includes('education')) {
             responseText = "For students, we have the PM-YASASVI Scholarship and Post-Matric Scholarships. You can apply if your income is below 2.5L.";
-        } else if (lowerText.includes('health') || lowerText.includes('medical')) {
+        } else if (lowerText.includes('health') || lowerText.includes('medical') || lowerText.includes('doctor')) {
             responseText = "Ayushman Bharat provides health cover up to 5 Lakhs per family. Check if you are eligible in the Schemes section.";
-        } else if (lowerText.includes('farmer') || lowerText.includes('kisan')) {
+        } else if (lowerText.includes('farmer') || lowerText.includes('kisan') || lowerText.includes('agriculture')) {
             responseText = "PM-KISAN provides ₹6,000 per year to eligible farmers. Check the 'Agriculture' category for more details.";
-        } else if (lowerText.includes('pension') || lowerText.includes('old')) {
+        } else if (lowerText.includes('pension') || lowerText.includes('old') || lowerText.includes('senior')) {
             responseText = "We have the Indira Gandhi National Old Age Pension Scheme (IGNOAPS) for senior citizens.";
-        } else if (lowerText.includes('document')) {
-            responseText = "Common documents needed are Aadhar Card, Income Certificate, and Caste Certificate. Check your Document Locker.";
+        } else if (lowerText.includes('document') || lowerText.includes('aadhaar')) {
+            responseText = "Common documents needed are Aadhaar Card, Income Certificate, and Caste Certificate. You can link your DigiLocker in the Document Locker section.";
+        } else if (lowerText.includes('apply') || lowerText.includes('how to')) {
+            responseText = "You can apply for schemes by visiting the 'Explore Schemes' page, selecting a scheme, and clicking 'Apply' or 'Track Application'.";
         }
 
         return {
@@ -81,11 +83,11 @@ export const SchemeBot = () => {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end pointer-events-none">
+        <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end pointer-events-none">
 
             {/* Chat Window */}
             {isOpen && (
-                <div className="bg-white rounded-2xl shadow-2xl w-80 sm:w-96 mb-4 overflow-hidden border border-slate-200 pointer-events-auto animate-in slide-in-from-bottom-10 fade-in duration-200">
+                <div className="bg-white rounded-2xl shadow-2xl w-80 sm:w-96 mb-4 overflow-hidden border border-slate-200 pointer-events-auto">
                     <div className="bg-gradient-to-r from-primary-600 to-primary-700 p-4 flex justify-between items-center text-white">
                         <div className="flex items-center gap-2">
                             <div className="bg-white/20 p-1.5 rounded-full">
@@ -99,7 +101,7 @@ export const SchemeBot = () => {
                                 </div>
                             </div>
                         </div>
-                        <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/20 rounded-full transition-colors">
+                        <button type="button" onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/20 rounded-full transition-colors">
                             <X className="w-5 h-5" />
                         </button>
                     </div>
@@ -108,8 +110,8 @@ export const SchemeBot = () => {
                         {messages.map((msg) => (
                             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${msg.sender === 'user'
-                                        ? 'bg-primary-600 text-white rounded-tr-none'
-                                        : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none shadow-sm'
+                                    ? 'bg-primary-600 text-white rounded-tr-none'
+                                    : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none shadow-sm'
                                     }`}>
                                     {msg.text}
                                 </div>
@@ -129,10 +131,11 @@ export const SchemeBot = () => {
 
                     <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-100 flex gap-2">
                         <input
+                            autoFocus
                             type="text"
                             value={inputText}
                             onChange={(e) => setInputText(e.target.value)}
-                            placeholder="Type your question..."
+                            placeholder="Type a question..."
                             className="flex-grow px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                         <button
@@ -148,6 +151,7 @@ export const SchemeBot = () => {
 
             {/* Toggle Button */}
             <button
+                type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className="bg-gradient-to-r from-primary-600 to-indigo-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all pointer-events-auto flex items-center gap-2 group"
             >
