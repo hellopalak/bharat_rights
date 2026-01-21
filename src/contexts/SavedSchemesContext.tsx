@@ -14,20 +14,26 @@ const SavedSchemesContext = createContext<SavedSchemesContextType | undefined>(u
 
 export const SavedSchemesProvider = ({ children }: { children: ReactNode }) => {
     const [savedSchemeIds, setSavedSchemeIds] = useState<string[]>([]);
-    const { user } = useAuth(); // Reload when user changes
+    const { user, loading } = useAuth(); // Reload when user changes
 
     // Load saved schemes
     useEffect(() => {
         const loadSaved = async () => {
+            if (loading) return; // Wait for auth to initialize
+
             try {
-                const ids = await dbService.getSavedSchemes();
-                setSavedSchemeIds(ids);
+                if (user) {
+                    const ids = await dbService.getSavedSchemes();
+                    setSavedSchemeIds(ids);
+                } else {
+                    setSavedSchemeIds([]);
+                }
             } catch (e) {
                 console.error("Failed to load saved schemes", e);
             }
         };
         loadSaved();
-    }, [user]);
+    }, [user, loading]);
 
     const saveScheme = async (id: string) => {
         // Optimistic update

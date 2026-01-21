@@ -21,34 +21,78 @@ interface ApplicationContextType {
 
 const ApplicationContext = createContext<ApplicationContextType | undefined>(undefined);
 
+import { dbService } from '../services/DatabaseService';
+import { notificationService } from '../services/notificationService'; // For alerts
+import { useAuth } from './AuthContext';
+
+// ... (existing imports/interfaces)
+
 export const ApplicationProvider = ({ children }: { children: ReactNode }) => {
     const [applications, setApplications] = useState<Application[]>([]);
+    const { user } = useAuth();
 
-    // Load from local storage
+    // 1. Load from Database on mount and user change
     useEffect(() => {
-        const saved = localStorage.getItem('applications');
-        if (saved) {
-            try {
-                setApplications(JSON.parse(saved));
-            } catch (e) {
-                console.error("Failed to parse applications", e);
+        const loadApps = async () => {
+            if (user) {
+                const apps = await dbService.getApplications();
+                setApplications(apps);
+            } else {
+                setApplications([]);
             }
-        } else {
-            // Initialize with some mock data if empty (optional, or empty)
-            // Let's keep it empty or maybe the previous mock data for demo purposes if the user wants?
-            // User requested "Engagement features", finding existing bugs. 
-            // Better start fresh or keep the mocks if useful? 
-            // Let's keep the user-defined mocks if nothing is there, so the page isn't blank initially?
-            // No, fresh is better for a "real" feel.
-        }
-    }, []);
+        };
+        loadApps();
+    }, [user]);
 
-    // Save to local storage
+    // 2. Simulation Loop: Upgrade status every 15 seconds
     useEffect(() => {
-        localStorage.setItem('applications', JSON.stringify(applications));
-    }, [applications]);
+        if (!user) return;
 
-    const addApplication = (schemeId: string, schemeName: string) => {
+        const interval = setInterval(() => {
+            setApplications(currentApps => {
+                let hasChanges = false;
+                const updatedApps = currentApps.map(app => {
+                    // Logic to upgrade status
+                    let newStep = app.step;
+                    let newStatus = app.status;
+
+                    // Only upgrade if not finished (step 4)
+                    if (app.step < 4) {
+                        // 30% chance to upgrade per tick to make it random/staggered
+                        if (Math.random() > 0.7) {
+                            newStep += 1;
+                            if (newStep === 2) newStatus = 'Under Review';
+                            if (newStep === 3) newStatus = 'Verified';
+                            if (newStep === 4) newStatus = 'Approved';
+
+                            hasChanges = true;
+
+                            // Sync to DB
+                            // We do this "fire and forget" here for the simulation to avoid freezing UI
+                            const upgradedApp = { ...app, status: newStatus, step: newStep };
+                            dbService.saveApplication(upgradedApp);
+
+                            // Optional: Notify user
+                            notificationService.sendNotification(user.id, {
+                                title: 'Application Update',
+                                message: `Your application for ${app.schemeName} is now ${newStatus}.`,
+                                type: 'info',
+                                time: new Date().toISOString(),
+                                link: '/applications'
+                            });
+                        }
+                    }
+                    return { ...app, step: newStep, status: newStatus };
+                });
+
+                return hasChanges ? updatedApps : currentApps;
+            });
+        }, 15000); // Check every 15 seconds
+
+        return () => clearInterval(interval);
+    }, [user]);
+
+    const addApplication = async (schemeId: string, schemeName: string) => {
         const newApp: Application = {
             id: `APP-${Date.now()}`,
             schemeId,
@@ -58,16 +102,38 @@ export const ApplicationProvider = ({ children }: { children: ReactNode }) => {
             step: 1,
             totalSteps: 4
         };
+
+        // Optimistic UI update
         setApplications(prev => [newApp, ...prev]);
+
+        // Save to DB
+        await dbService.saveApplication(newApp);
+
+        if (user) {
+            notificationService.sendNotification(user.id, {
+                title: 'Application Submitted',
+                message: `We have received your application for ${schemeName}.`,
+                type: 'success' as any,
+                time: new Date().toISOString(),
+                link: '/applications'
+            });
+        }
     };
 
-    const updateStatus = (id: string, status: Application['status'], step: number) => {
-        setApplications(prev => prev.map(app =>
-            app.id === id ? { ...app, status, step } : app
-        ));
+    const updateStatus = async (id: string, status: Application['status'], step: number) => {
+        // Find current app
+        const app = applications.find(a => a.id === id);
+        if (!app) return;
+
+        const updatedApp = { ...app, status, step };
+
+        setApplications(prev => prev.map(a => a.id === id ? updatedApp : a));
+        await dbService.saveApplication(updatedApp);
     };
 
-    const removeApplication = (id: string) => {
+    const removeApplication = async (id: string) => {
+        // Start by just removing from UI, database delete not implemented in service yet
+        // but simulation is enough for now.
         setApplications(prev => prev.filter(app => app.id !== id));
     };
 

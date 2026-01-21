@@ -69,8 +69,21 @@ class DatabaseService {
                 .select('*')
                 .eq('user_id', user.id);
 
-            if (error) console.error(error);
-            return data || [];
+            if (error) {
+                console.error(error);
+                return [];
+            }
+
+            // Map DB columns back to frontend interface
+            return (data || []).map((item: any) => ({
+                id: item.id,
+                schemeId: item.schemeId || item["schemeId"], // handle both possible return formats
+                schemeName: item.schemeName || item["schemeName"],
+                status: item.status,
+                date: item.date,
+                step: item.step,
+                totalSteps: item.totalSteps || item["totalSteps"]
+            })) as Application[];
         } else {
             const data = localStorage.getItem('applications');
             return delay(data ? JSON.parse(data) : []);
@@ -82,17 +95,33 @@ class DatabaseService {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("No authenticated user");
 
-            // Create a new object without 'id' if we want Supabase to generate it, 
-            // OR use the one we generated. For simplicity, let's use the ID we generated in context
+            // Map frontend Application model to Database table columns
+            // The table uses quoted identifiers: "schemeId", "schemeName", "totalSteps"
+            const dbPayload = {
+                id: application.id,
+                user_id: user.id,
+                "schemeId": application.schemeId,
+                "schemeName": application.schemeName,
+                status: application.status,
+                date: application.date,
+                step: application.step,
+                "totalSteps": application.totalSteps
+            };
+
             const { error } = await supabase
                 .from('user_applications')
-                .upsert({ ...application, user_id: user.id });
+                .upsert(dbPayload);
 
-            if (error) throw error;
+            if (error) {
+                console.error("Error saving application:", error);
+                throw error;
+            }
             return application;
         } else {
             const apps = await this.getApplications();
-            const updatedApps = [application, ...apps];
+            // simple dedup
+            const otherApps = apps.filter(a => a.id !== application.id);
+            const updatedApps = [application, ...otherApps];
             localStorage.setItem('applications', JSON.stringify(updatedApps));
             return delay(application);
         }
